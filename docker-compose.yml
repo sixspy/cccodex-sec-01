@@ -1,0 +1,27 @@
+services:
+  sec-lab:
+    build: .
+    container_name: cc-sec-lab-sec-01
+    ports:
+      - "5800:5800"
+    environment:
+      HOST: "0.0.0.0"
+      PORT: "5800"
+      DATABASE_PATH: /app/instance/sec_lab.db
+    volumes:
+      - sec_lab_data:/app/instance
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://127.0.0.1:5800/login', timeout=5)",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+
+volumes:
+  sec_lab_data:
