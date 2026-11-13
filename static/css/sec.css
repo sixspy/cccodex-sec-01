@@ -8,6 +8,7 @@
   --accent-soft: #ccfbf1;
   --danger: #b42318;
   --warn: #b54708;
+  --review: #1d4ed8;
   --font: "IBM Plex Sans", "Segoe UI", sans-serif;
   --mono: "IBM Plex Mono", Consolas, monospace;
 }
@@ -45,13 +46,14 @@ body {
   font-size: 1.6rem;
 }
 .hint, .muted { color: var(--muted); font-size: 0.9rem; }
+.small { font-size: 0.8rem; }
 label {
   display: grid;
   gap: 0.35rem;
   margin: 0.85rem 0;
   font-size: 0.9rem;
 }
-input {
+input, select {
   padding: 0.65rem 0.75rem;
   border: 1px solid var(--line);
   background: #fff;
@@ -65,10 +67,17 @@ button {
   font: inherit;
   cursor: pointer;
 }
-.err { color: var(--danger); }
+button:disabled {
+  background: var(--line);
+  color: var(--muted);
+  cursor: not-allowed;
+}
+.err { color: var(--danger); font-weight: 600; }
+.ok { color: var(--accent); font-weight: 600; }
+.warn-text { color: var(--warn); font-weight: 600; }
 
 .shell {
-  max-width: 1100px;
+  max-width: 1280px;
   margin: 0 auto;
   padding: 1.25rem 1rem 2.5rem;
 }
@@ -87,14 +96,51 @@ button {
 }
 .stack { display: grid; gap: 0.15rem; }
 
+/* 横排台账指标 */
+.stat-strip {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+@media (max-width: 980px) {
+  .stat-strip { grid-template-columns: repeat(2, 1fr); }
+}
+.stat {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-top: 3px solid var(--accent);
+  padding: 0.75rem 0.9rem;
+}
+.stat-label {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+}
+.stat-value {
+  margin: 0.25rem 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  font-family: var(--mono);
+}
+.stat-sub { margin: 0; font-size: 0.75rem; color: var(--muted); }
+.stat-warn { border-top-color: var(--warn); }
+.stat-warn .stat-value { color: var(--warn); font-size: 1.05rem; }
+.stat-review { border-top-color: var(--review); }
+.stat-review .stat-value { color: var(--review); }
+.stat-closed { border-top-color: var(--muted); }
+.stat-closed .stat-value { color: var(--muted); }
+
 .grid {
   display: grid;
-  grid-template-columns: 1.2fr 0.8fr;
+  grid-template-columns: 1.15fr 0.85fr;
   gap: 1rem;
 }
-@media (max-width: 860px) {
+@media (max-width: 980px) {
   .grid { grid-template-columns: 1fr; }
 }
+.col { display: grid; gap: 1rem; align-content: start; }
 
 .panel {
   background: var(--panel);
@@ -105,6 +151,21 @@ button {
   margin: 0 0 0.75rem;
   font-size: 1rem;
   letter-spacing: 0.04em;
+}
+.panel h3 {
+  margin: 0.6rem 0 0.35rem;
+  font-size: 0.88rem;
+  color: var(--accent);
+}
+.count-badge {
+  display: inline-block;
+  min-width: 1.6rem;
+  padding: 0.1rem 0.45rem;
+  background: var(--accent);
+  color: #fff;
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  text-align: center;
 }
 table {
   width: 100%;
@@ -122,10 +183,7 @@ th {
   font-weight: 600;
   font-size: 0.8rem;
 }
-tr.clickable { cursor: pointer; }
-tr.clickable:hover { background: var(--accent-soft); }
-tr.active { background: var(--accent-soft); }
-.fp {
+.fp, .fp-input {
   font-family: var(--mono);
   font-size: 0.82rem;
 }
@@ -134,17 +192,28 @@ tr.active { background: var(--accent-soft); }
   padding: 0.15rem 0.45rem;
   border: 1px solid var(--line);
   font-size: 0.78rem;
+  margin-left: 0.25rem;
 }
 .pill.high { border-color: var(--danger); color: var(--danger); }
 .pill.mid { border-color: var(--warn); color: var(--warn); }
-.detail dl {
-  display: grid;
-  grid-template-columns: 6rem 1fr;
-  gap: 0.45rem 0.75rem;
-  margin: 0;
+.pill.lost {
+  border-color: var(--danger);
+  color: #fff;
+  background: var(--danger);
 }
-.detail dt { color: var(--muted); }
-.detail dd { margin: 0; }
+.pill.no-sev { border-color: var(--muted); color: var(--muted); }
+.pill.handling { border-color: var(--accent); color: var(--accent); }
+.pill.review { border-color: var(--review); color: var(--review); }
+.pill.closed { border-color: var(--muted); color: var(--muted); }
+.pill.mode-merge { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); }
+.pill.mode-chain { border-color: #7c3aed; color: #7c3aed; }
+.strong { font-weight: 700; }
+.statement {
+  background: #fff;
+  border: 1px solid var(--line);
+  padding: 0.5rem 0.6rem;
+  line-height: 1.5;
+}
 .empty { color: var(--muted); padding: 1rem 0; }
 .linkish {
   background: transparent;
@@ -152,3 +221,91 @@ tr.active { background: var(--accent-soft); }
   padding: 0;
   text-decoration: underline;
 }
+
+/* 表单 */
+.form-row { display: flex; gap: 1.25rem; margin: 0.5rem 0; }
+.rule-option {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0;
+  font-weight: 600;
+}
+.rule-option input { width: auto; }
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 0.75rem;
+}
+.form-grid label { margin: 0.25rem 0; }
+@media (max-width: 720px) {
+  .form-grid { grid-template-columns: 1fr; }
+}
+
+/* kv 详情 */
+.kv {
+  display: grid;
+  grid-template-columns: 7rem 1fr;
+  gap: 0.45rem 0.75rem;
+  margin: 0;
+}
+.kv dt { color: var(--muted); }
+.kv dd { margin: 0; }
+.sub-detail {
+  margin-top: 0.75rem;
+  padding: 0.75rem;
+  border: 1px dashed var(--line);
+  background: #fff;
+}
+
+/* 处置单卡片 */
+.ticket {
+  border: 1px solid var(--line);
+  background: #fff;
+  margin-bottom: 0.75rem;
+}
+.ticket.review { border-left: 4px solid var(--review); }
+.ticket.closed { border-left: 4px solid var(--muted); opacity: 0.92; }
+.ticket-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.65rem 0.75rem;
+  cursor: pointer;
+  flex-wrap: wrap;
+}
+.ticket-head:hover { background: var(--accent-soft); }
+.ticket-body {
+  padding: 0.25rem 0.75rem 0.85rem;
+  border-top: 1px solid var(--line);
+}
+.member-list, .chain-list, .claim-log {
+  margin: 0.35rem 0;
+  padding-left: 1.2rem;
+  font-size: 0.88rem;
+  line-height: 1.8;
+}
+.chain-list li.current {
+  font-weight: 700;
+  color: var(--accent);
+}
+.chain-box {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  padding: 0.4rem 0.75rem 0.65rem;
+  margin-top: 0.5rem;
+}
+.contention-box {
+  margin-top: 0.5rem;
+  border: 1px solid var(--danger);
+  background: #fef3f2;
+  padding: 0.35rem 0.75rem 0.55rem;
+}
+.contention-box ul { margin: 0.25rem 0; padding-left: 1.2rem; font-size: 0.85rem; }
+.submit-box {
+  margin-top: 0.65rem;
+  padding-top: 0.55rem;
+  border-top: 1px dashed var(--line);
+}
+.contention-panel .claim-log li { margin-bottom: 0.35rem; }
